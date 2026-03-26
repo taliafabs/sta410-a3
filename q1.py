@@ -21,7 +21,7 @@ X_normalized = (X_data - np.mean(X_data, axis=0)) / np.std(X_data, axis=0)
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-# TODO: (b) how centering & scaling affects condition numbers
+# (b) how centering & scaling affects condition numbers
 # ---------------------------------------------------------------------------------------------------------------------
 # Condition numbers
 unnormalized_cond_num = np.linalg.cond(X_data)
@@ -68,9 +68,8 @@ plt.grid(True, which="both", ls='-', alpha=0.5)
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-# TODO: (c)
+# (c) Randomized SVD Implementation
 # ---------------------------------------------------------------------------------------------------------------------
-
 def randomized_svd(X = X_normalized, r=5):
     """
     Randomized SVD Algorithm from the Assignment 3 handout, Steps 1 through 6
@@ -92,9 +91,8 @@ def randomized_svd(X = X_normalized, r=5):
 # ---------------------------------------------------------------------------------------------------------------------
 
 
-# TODO: (d)
+# (d)
 # ---------------------------------------------------------------------------------------------------------------------
-
 def find_smallest_ratio(X = X_normalized, threshold=0.2):
     """
     Find the smallest ratio of r to p for which:
