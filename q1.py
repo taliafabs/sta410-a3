@@ -15,7 +15,7 @@ X = sm.datasets.get_rdataset("mtcars").data.values
 n, p = X.shape[0], X.shape[1]
 
 
-# TODO: (a) center and scale the columns of x so that they have mean 0 and standard deviation 1
+# (a) center and scale the columns of x so that they have mean 0 and standard deviation 1
 # ---------------------------------------------------------------------------------------------------------------------
 normalized_data_np = (X - np.mean(X, axis=0)) / np.std(X, axis=0)
 X_normalized = normalized_data_np
@@ -29,7 +29,6 @@ unnormalized_cond_num = np.linalg.cond(X)
 normalized_cond_num = np.linalg.cond(X_normalized)
 
 # Singular values
-# Step 1: Compute the singular values
 singular_values = np.linalg.svd(X, compute_uv=False)
 singular_values_normalized = np.linalg.svd(X_normalized, compute_uv=False)
 
@@ -38,14 +37,15 @@ np.linalg.qr(X)
 np.linalg.qr(X_normalized)
 
 # Compare the condition numbers before & after normalization
-print(f"Un-normalized condition number: {unnormalized_cond_num}")
-print(f"Normalized condition number: {normalized_cond_num}")
+print(f"Condition numbers of the matrix X:")
+print(f"Before normalization (centering): {unnormalized_cond_num}")
+print(f"After normalization (centering): {normalized_cond_num}")
 
 # Plot the singular values on a log scale
 # un-normalized
 plt.figure(figsize=(8, 5))
 plt.semilogy(singular_values, marker='o', linestyle='-', markersize=3)
-plt.title('Unnormalized singular values')
+plt.title('Singular values before normalization')
 plt.xlabel('Index')
 plt.ylabel('Singular value magnitude (log scale)')
 plt.grid(True, which="both", ls='-', alpha=0.5)
@@ -53,7 +53,7 @@ plt.grid(True, which="both", ls='-', alpha=0.5)
 # normalized
 plt.figure(figsize=(8, 5))
 plt.semilogy(singular_values_normalized, marker='o', linestyle='-', markersize=3)
-plt.title('Normalized singular values')
+plt.title('Singular values after normalization')
 plt.xlabel('Index')
 plt.ylabel('Singular value magnitude (log-scale)')
 plt.grid(True, which="both", ls='-', alpha=0.5)
@@ -85,26 +85,49 @@ def randomized_svd(X=X_normalized, r=5):
 
 # TODO: (d)
 # ---------------------------------------------------------------------------------------------------------------------
-r_values = [1, 2, 5, 10, 15, 20, 25]
+def find_smallest_ratio(X = X_normalized):
+    r, p = 1, X.shape[1]
+    norm_ratio = np.inf
+    while r < p and norm_ratio >= 0.2:
+        norm_ratio = np.linalg.norm((X - randomized_svd(X=X, r=r)), ord=1) /\
+                     np.linalg.norm(X, ord=1)
+        r += 1
+    if r <= p and norm_ratio < 0.2:
+        return print(f"r:{r}, norm_ratio={norm_ratio}, smallest ratio:{r/p}")
+    else:
+        return print(f"no r<p achieved <0.2")
 
-ratios = []
 
-# un-normalized
-for r in r_values:
-    X_tilde = randomized_svd(X=X, r=r)
-    numerator = np.linalg.norm((X - X_tilde), 1)
-    denominator = np.linalg.norm(X, 1)
-    ratio = numerator / denominator
-    ratios.append(ratio)
-print(ratios)
+find_smallest_ratio(X=X)
+find_smallest_ratio(X=X_normalized)
+# r_values = [1, 2, 5, 10, 15, 20, 25]
+#
+# ratios = []
+#
+# # un-normalized
+# for r in r_values:
+#     X_tilde = randomized_svd(X=X, r=r)
+#     numerator = np.linalg.norm((X - X_tilde), 1)
+#     denominator = np.linalg.norm(X, 1)
+#     ratio = numerator / denominator
+#     ratios.append(ratio)
+# print(ratios)
 
 # normalized
-ratios = []
-for r in r_values:
-    X_tilde = randomized_svd(X=X_normalized, r=r)
-    numerator = np.linalg.norm((X_normalized - X_tilde), 1)
-    denominator = np.linalg.norm(X_normalized, 1)
-    ratio = numerator / denominator
-    ratios.append(ratio)
-print(ratios)
+# ratios = {}
+# r = 1
+# while r < p:
+#     X_tilde = randomized_svd(X=X_normalized, r=r)
+#     numerator = np.linalg.norm((X_normalized - X_tilde), ord=1)
+#     denominator = np.linalg.norm(X_normalized, ord=1)
+#     ratios[r] = (numerator / denominator)
+#     r += 1
+# print(ratios)
+# X_tilde = randomized_svd(X=X_normalized, r=1)
+# norm_ratio = np.linalg.norm((X_normalized - X_tilde), ord=1) / np.linalg.norm(X_normalized, ord=1)
+# r = 2
+# while r < p and norm_ratio >= 0.2:
+#     X_tilde = randomized_svd(X=X_normalized, r=1)
+#     norm_ratio = np.linalg.norm((X_normalized - X_tilde), ord=1) / np.linalg.norm(X_normalized, ord=1)
+
 # ---------------------------------------------------------------------------------------------------------------------
