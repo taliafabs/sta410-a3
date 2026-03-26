@@ -57,29 +57,37 @@ plt.show()
 # TODO: (c)
 
 # Step 1: generate random (p x r) matrix P with independent standard normal entries
-p, r = X.shape[1], 5
+r = 5
 P = np.zeros((p, r))
 for i in range(p):
     for j in range(r):
         P[i][j] = rng.standard_normal()
 
-# Step 2: compute Z= XP, which randomly samples the column space of X
-# using r samples in the column space of p
-Z = np.dot(X, P)
+# Step 2
+Z = np.dot(X_normalized, P)
 
-# Step 3: QR decomposition Z=QR, where Q is a (n x r) matrix of orthogonal columns and
-# R is a (r x r) square matrix
-# Q defines orthogonal basis for Z which approximates col space of X
+# Step 3
 Q, R = np.linalg.qr(Z)
+# print(f"Q: {Q.shape}")
+# print(f"R: {R.shape}")
 
-# Step 4: project X onto orthoganal directions Q as Y = Q^T X
-Y = np.dot(Q.T, X)
 
-# Step 5:
-# U_y, D_y, V_y_transpose = np.linalg.svd(Y)
+# Step 4 (r x p) matrix
+Y = np.dot(Q.T, X_normalized)
+# print(f"Y: {Y.shape}")
 
-# Step 6: approximate original matrix X
-# X_approx =
+# Step 5
+U_y, svs, V_y_transpose = np.linalg.svd(Y, full_matrices=False)
+D_y = np.diag(svs)
+# print(f"r={r}")
+# print(f"n={n}")
+# print(f"p={p}")
+# print(U_y.shape)
+# print(D_y.shape)
+# print(V_y_transpose.shape)
+
+# Step 6
+X_approx = Q @ U_y @ D_y @ V_y_transpose
 
 
 
