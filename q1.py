@@ -101,56 +101,40 @@ def find_smallest_ratio(X=X_normalized, threshold=0.2):
         ||X - Q U_y D_y V_y^T||_1 / ||X||_1 < 0.2
     where ||A||_1 is the sum of the absolute values of matrix A.
     """
-    r = 1  # start with r=1
     p = X.shape[1]
-    norm_ratio = np.inf
-    while r < p and norm_ratio >= threshold:
-        norm_ratio = np.linalg.norm((X - randomized_svd(X=X, r=r)), ord=1) / \
-                     np.linalg.norm(X, ord=1)
-        r += 1  # then increase it until threshold is met
-    if r <= p and norm_ratio < threshold:
-        return print(f"r:{r}, p:{p}, smallest ratio of r to p:{r / p}, norm_ratio={norm_ratio},")
-    else:
-        return print(f"no r ≤ p achieved < {threshold}")
+    l1_norm_X = np.linalg.norm(X, ord=1)
+    ratio_record=[]
+    for r in range(1, p+1): # r = 1, 2, ... p
+        X_r = randomized_svd(X=X, r=r)
+        l1_norm_error = np.linalg.norm((X-X_r), ord=1)
+        ratio = l1_norm_error / l1_norm_X
+        ratio_record.append(ratio.copy())
+        if ratio < threshold:
+            print(f"r:{r}, p:{p}, smallest ratio of r to p:{r / p}, norm_ratio={ratio},")
+            return ratio_record
+    print(f"no r ≤ p achieved l1 norm ratio < {threshold}")
+    return ratio_record
+
+    # r = 1  # start with r=1
+    # p = X.shape[1](X
+    # norm_ratio = np.inf
+    # while r < p and norm_ratio >= threshold:
+    #     norm_ratio = np.linalg.norm((X - randomized_svd(X=X, r=r)), ord=1) / \
+    #                  np.linalg.norm(X, ord=1)
+    #     r += 1  # then increase it until threshold is met
+    # if r <= p and norm_ratio < threshold:
+    #     return print(f"r:{r}, p:{p}, smallest ratio of r to p:{r / p}, norm_ratio={norm_ratio},")
+    # else:
+    #     return print(f"no r ≤ p achieved < {threshold}")
 
 
-print(" ")
 print(f"Part (d) output:")
 # before normalization aka centering & scaling
 print(f"Without centering & scaling")
-find_smallest_ratio(X=X_data)
+error_ratio_unnormalized = find_smallest_ratio(X=X_data)
+print(error_ratio_unnormalized)
 print(f"With centering & scaling")
 # after normalization aka centering & scaling
-find_smallest_ratio(X=X_normalized)
-
-# r_values = [1, 2, 5, 10, 15, 20, 25]
-#
-# ratios = []
-#
-# # un-normalized
-# for r in r_values:
-#     X_tilde = randomized_svd(X=X, r=r)
-#     numerator = np.linalg.norm((X - X_tilde), 1)
-#     denominator = np.linalg.norm(X, 1)
-#     ratio = numerator / denominator
-#     ratios.append(ratio)
-# print(ratios)
-
-# normalized
-# ratios = {}
-# r = 1
-# while r < p:
-#     X_tilde = randomized_svd(X=X_normalized, r=r)
-#     numerator = np.linalg.norm((X_normalized - X_tilde), ord=1)
-#     denominator = np.linalg.norm(X_normalized, ord=1)
-#     ratios[r] = (numerator / denominator)
-#     r += 1
-# print(ratios)
-# X_tilde = randomized_svd(X=X_normalized, r=1)
-# norm_ratio = np.linalg.norm((X_normalized - X_tilde), ord=1) / np.linalg.norm(X_normalized, ord=1)
-# r = 2
-# while r < p and norm_ratio >= 0.2:
-#     X_tilde = randomized_svd(X=X_normalized, r=1)
-#     norm_ratio = np.linalg.norm((X_normalized - X_tilde), ord=1) / np.linalg.norm(X_normalized, ord=1)
-
+error_ratio_normalized = find_smallest_ratio(X=X_normalized)
+print(error_ratio_normalized)
 # ---------------------------------------------------------------------------------------------------------------------
