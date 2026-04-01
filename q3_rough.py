@@ -1,9 +1,9 @@
 import numpy as np
 
 
-# TODO: 3(a) implement a function that given x returns f(x), the gradient, and the hessian
+# 3(a) implement a function that given x returns f(x), the gradient, and the hessian
 
-def func_a(x):
+def rosenbrock(x):
     """
     Given a 2x1 vector x, compute the value of the Rosenbrock function f(x) = (1 - x1)^2 + (x2 - x1^2)^2,
     its gradient vector f'(x), and its hessian matrix f''(x)
@@ -38,12 +38,12 @@ def gradient_descent(x_0, alpha, epsilon, n_max=300):
     x_k = x_0.copy()
     k = 0
     optimization_path = [x_k.copy()]
-    convergence_history = [func_a(x_k)[0].copy()]
+    convergence_history = [rosenbrock(x_k)[0].copy()]
     while k < n_max:
         # func = func_a(x_k)
         # f_x_k, grad_x_k = func[0], func[1]
         # convergence_history.append(f_x_k.copy())
-        grad_x_k = func_a(x_k)[1]
+        grad_x_k = rosenbrock(x_k)[1]
         # stop early if || ∇f(x_k) || < ε
         if np.linalg.norm(grad_x_k) < epsilon:
             return optimization_path, convergence_history
@@ -52,7 +52,7 @@ def gradient_descent(x_0, alpha, epsilon, n_max=300):
         x_k = x_k_1
         # keep track of the gradient & value
         optimization_path.append(x_k.copy())
-        convergence_history.append(func_a(x_k)[0].copy())
+        convergence_history.append(rosenbrock(x_k)[0].copy())
         k += 1
     return optimization_path, convergence_history
 
@@ -65,3 +65,7 @@ def gradient_descent(x_0, alpha, epsilon, n_max=300):
 # def phi_alpha(alpha, x_k):
 #     grad_x_k = func_a(x_k)[1]
 #     u_k = -1 * (grad_x_k / np.linalg.norm(grad_x_k))
+
+def phi_prime(alpha, x, u):
+    grad = rosenbrock(x + alpha * u)[1]
+    return np.dot(grad.T, u)
