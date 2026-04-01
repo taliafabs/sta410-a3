@@ -62,8 +62,6 @@ plt.xlabel('Index')
 plt.ylabel('Singular value magnitude (log-scale)')
 plt.grid(True, which="both", ls='-', alpha=0.5)
 # plt.show()
-
-
 # ---------------------------------------------------------------------------------------------------------------------
 
 
