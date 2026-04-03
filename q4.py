@@ -2,13 +2,13 @@ import numpy as np
 from numpy import random
 import matplotlib.pyplot as plt
 
-rng = random.default_rng(123)
+rng = random.default_rng(410)
 
 # QUESTION 4: EM ALGORITHM FOR A MIXTURE OF EXPONENTIALS
 # ------------------------------------------------------
 
 
-# TODO: (d) implement the EM algorithm. generate N=200 observations using true parameters
+# (d) implement the EM algorithm. generate N=200 observations using true parameters
 #  lambda1=1, lambda2=5, theta=0,4
 # -------------------------------------------------------------------------------------------
 # generate the data
@@ -34,7 +34,7 @@ def EM(x=observed_data, theta_init=0.5, lamb1_init=2.0,
     Expectation maximization algorithm for a mixture of two exponential components.
     """
     n = len(x)
-    # initialize & keep track of log likelihood
+    # initialize & keep track of the log likelihood
     ll_init = np.sum(np.log(theta_init * lamb1_init * np.exp(- lamb1_init * x) +
                             (1 - theta_init) * lamb2_init * np.exp(- lamb2_init * x)
                             )
@@ -54,17 +54,16 @@ def EM(x=observed_data, theta_init=0.5, lamb1_init=2.0,
         # update the observed data log likelihood
         ll_new = np.sum(np.log(theta_new * lamb1_new * np.exp(- lamb1_new * x) +
                                (1 - theta_new) * lamb2_new * np.exp(- lamb2_new * x)
-                               )
-                        )
-        if np.abs(ll_new - ll) < tolerance:  # stop if the EM alg has converged
-            converged = True
-        # otherwise update params + keep track of log likelihood
+                               ))
+        if np.abs(ll_new - ll) < tolerance:
+            converged = True    # stop if the EM alg has converged
+        # update params + keep track of log likelihood
         log_likelihood_values.append(ll_new)
         theta, lamb1, lamb2, ll = theta_new, lamb1_new, lamb2_new, ll_new
     return lamb1, lamb2, theta, log_likelihood_values
 
 
-# TODO: (e) plot the log likelihood at each iteration of the EM alg
+# (e) plot the log likelihood at each iteration of the EM alg
 #  illustrate monotone increasing property of EM
 #  how many iterations until convergence?
 # ------------------------------------------------------------------
@@ -85,31 +84,46 @@ num_its_conv = len(log_likelihood)
 print(f"Number of EM iterations required before convergence: {num_its_conv}")
 
 
-# TODO: (f) Is the observed data log likelihood unimodal? Try at least 3 different starting values 
-#  and coment on whether EM runs converge to the same solution
-# -----------------------------------------
+#  (f) Is the observed data log likelihood unimodal? Try at least 3 different starting values
+#  and comment on whether EM runs converge to the same solution
+# ----------------------------------------------------------------------------------------
+# 5 different starting values to try
+starting_values = [(0.95, 16, 1), (0.45, 1.5, 4), (0.67, 6, 7),
+                   (0.38, 0.98, 5.2), (0.10, 10, 10)]
 
-# starting values that are nowhere near true values
-result1 = EM(x=observed_data, theta_init=0.95, lamb1_init=16, lamb2_init=1)
-# starting values somewhat close
-result2 = EM(x=observed_data, theta_init=0.45, lamb1_init=1.5, lamb2_init=4)
-# another arbitrarily chosen starting point
-result3 = EM(x=observed_data, theta_init=0.67, lamb1_init=6, lamb2_init=7)
-# starting point very close to true values
-result4 = EM(x=observed_data, theta_init=0.38, lamb1_init=0.98, lamb2_init=5.2)
-result5 = EM(x=observed_data, theta_init=0.1, lamb1_init=10, lamb2_init=10)
+print("EM solutions after convergence using different starting values\n")
+for i, (theta0, l1_0, l2_0) in enumerate(starting_values, start=1):
+    result = EM(x=observed_data, theta_init=theta0, lamb1_init=l1_0, lamb2_init=l2_0)
+    print(f"Starting values set {i}: lambda1={l1_0}, lambda2={l2_0}, theta={theta0}")
+    print(f"  lambda1: {result[0]}")
+    print(f"  lambda2: {result[1]}")
+    print(f"  theta:   {result[2]}")
+    print(f"  log likelihood: {result[3]}\n")
 
-print(f"EM solutions after convergence using different starting values")
-print(" ")
-print(f"starting values: lambda1=16, lambda2=1, theta=0.95")
-print(f"lambda1:{result1[0]}, lambda2: {result1[1]}, theta: {result1[2]}")
-print(" ")
-print(f"starting values: lambda1=1.5, lambda2=4, theta=0.45")
-print(f"lambda1:{result2[0]}, lambda2: {result2[1]}, theta: {result2[2]}")
-print(" ")
-print(f"starting values: lambda1=6, lambda2=7, theta=0.67")
-print(f"lambda1:{result3[0]}, lambda2: {result3[1]}, theta: {result3[2]}")
-print(" ")
-print(f"starting values: lambda1=10, lambda2=10, theta=0.1")
-print(f"lambda1:{result4[0]}, lambda2: {result4[1]}, theta: {result4[2]}")
+# # starting values that are nowhere near true values
+# result1 = EM(x=observed_data, theta_init=0.95, lamb1_init=16, lamb2_init=1)
+# # starting values somewhat close
+# result2 = EM(x=observed_data, theta_init=0.45, lamb1_init=1.5, lamb2_init=4)
+# # another arbitrarily chosen starting point
+# result3 = EM(x=observed_data, theta_init=0.67, lamb1_init=6, lamb2_init=7)
+# # starting point very close to true values
+# result4 = EM(x=observed_data, theta_init=0.38, lamb1_init=0.98, lamb2_init=5.2)
+# result5 = EM(x=observed_data, theta_init=0.1, lamb1_init=10, lamb2_init=10)
+#
+# print(f"EM solutions after convergence using different starting values")
+# print(" ")
+# print(f"starting values: lambda1=16, lambda2=1, theta=0.95")
+# print(f"lambda1:{result1[0]}, lambda2: {result1[1]}, theta: {result1[2]}, log likelihood: {result1[3]}")
+# print(" ")
+# print(f"starting values: lambda1=1.5, lambda2=4, theta=0.45")
+# print(f"lambda1:{result2[0]}, lambda2: {result2[1]}, theta: {result2[2]}, log likelihood: {result2[3]}")
+# print(" ")
+# print(f"starting values: lambda1=6, lambda2=7, theta=0.67")
+# print(f"lambda1:{result3[0]}, lambda2: {result3[1]}, theta: {result3[2]}, log likelihood: {result3[3]}")
+# print(" ")
+# print(f"starting values: lambda1=0.98, lambda2=5.2, theta=0.38")
+# print(f"lambda1:{result4[0]}, lambda2: {result4[1]}, theta: {result4[2]}, log likelihood: {result4[3]}")
+# print(" ")
+# print(f"starting values: lambda1=0.10, lambda2=10, theta=0.1")
+# print(f"lambda1:{result5[0]}, lambda2: {result5[1]}, theta: {result5[2]}, log likelihood: {result5[3]}")
 
