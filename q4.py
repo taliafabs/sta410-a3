@@ -2,10 +2,17 @@ import numpy as np
 from numpy import random
 import matplotlib.pyplot as plt
 
-rng = random.default_rng(410)
+rng = random.default_rng(123)
 
 # QUESTION 4: EM ALGORITHM FOR A MIXTURE OF EXPONENTIALS
 # ------------------------------------------------------
+
+
+def pdf(x, lambda1, lambda2, theta):
+    """
+    The pdf of a two-component mixture of exponential distributions
+    """
+    return theta * lambda1 * np.exp(- lambda1 * x) + (1 - theta) * lambda2 * np.exp(- lambda2 * x)
 
 
 # (d) implement the EM algorithm. generate N=200 observations using true parameters
@@ -19,13 +26,6 @@ observed_data = np.where(component == 1,
                          rng.exponential(scale=1/true_lambda1, size=num_obs),
                          rng.exponential(scale=1/true_lambda2, size=num_obs)
                          )
-
-# plot the observed data
-plt.hist(observed_data, bins=50, density=True, alpha=0.7, color="turquoise")
-plt.xlabel("x")
-plt.ylabel("p(x)")
-plt.title("Two-component mixture of exponential distributions")
-plt.show()
 
 
 def EM(x=observed_data, theta_init=0.5, lamb1_init=2.0,
@@ -75,13 +75,28 @@ lamb1_hat, lamb2_hat, theta_hat, log_likelihood = EM()
 plt.figure(figsize=(10, 7))
 plt.title("Log Likelihood vs Number of EM Iterations")
 plt.xlabel("# iterations")
-plt.ylabel("Observed data log likelihood")
+plt.ylabel("Log likelihood")
 plt.plot(log_likelihood, '-o', markersize=2.1, color="magenta")
 plt.show()
 
 # determine how many iterations EM required before convergence
 num_its_conv = len(log_likelihood)
 print(f"Number of EM iterations required before convergence: {num_its_conv}")
+
+# plot the observed data, true pdf, and estimated pdf based on results of em algorithm
+# plot the observed data
+x_sorted = np.sort(observed_data.copy())
+true_pdf = pdf(x=x_sorted, lambda1=true_lambda1, lambda2=true_lambda2, theta=true_theta)
+em_estimated_pdf = pdf(x=x_sorted, lambda1=lamb1_hat, lambda2=lamb2_hat, theta=theta_hat)
+plt.hist(observed_data, bins=50, density=True, alpha=0.7, color="paleturquoise")
+plt.plot(x_sorted, true_pdf, color="slateblue", label="true pdf")
+plt.plot(x_sorted, em_estimated_pdf, color="hotpink", label="EM estimated pdf")
+plt.xlabel("x")
+plt.ylabel("p(x)")
+plt.legend()
+plt.title("Two-component mixture of exponential distributions")
+plt.show()
+
 
 
 #  (f) Is the observed data log likelihood unimodal? Try at least 3 different starting values
@@ -94,11 +109,9 @@ starting_values = [(0.95, 16, 1), (0.45, 1.5, 4), (0.67, 6, 7),
 print("EM solutions after convergence using different starting values\n")
 for i, (theta0, l1_0, l2_0) in enumerate(starting_values, start=1):
     result = EM(x=observed_data, theta_init=theta0, lamb1_init=l1_0, lamb2_init=l2_0)
-    print(f"Starting values set {i}: lambda1={l1_0}, lambda2={l2_0}, theta={theta0}")
-    print(f"  lambda1: {result[0]}")
-    print(f"  lambda2: {result[1]}")
-    print(f"  theta:   {result[2]}")
-    print(f"  log likelihood: {result[3]}\n")
+    print(f"Starting values: lambda1={l1_0}, lambda2={l2_0}, theta={theta0}")
+    print(f"EM solution: lambda1={result[0]}, lambda2={result[1]}, theta={result[2]}")
+    print(f"log likelihood={result[3][-1]}\n")
 
 # # starting values that are nowhere near true values
 # result1 = EM(x=observed_data, theta_init=0.95, lamb1_init=16, lamb2_init=1)

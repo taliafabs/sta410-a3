@@ -29,7 +29,7 @@ alpha, gamma, lamb = 10, 0.5, 0.1
 niter = 1000
 
 
-def iterative_alg(alpha, gamma, lamb, niter):
+def iterative_alg(alpha, gamma, lamb, niter, tolerance=1e-10):
     x_0 = alpha
     x_k = x_0
     k = 1

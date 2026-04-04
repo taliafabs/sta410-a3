@@ -35,23 +35,20 @@ def iterative_alg(alpha, gamma, lamb, tolerance=1e-15, max_iter=5000):
 def f_prime(x, alpha, gamma, lamb):
     if x == 0:
         raise ValueError("f(x) is not differentiable at cusp x = 0")
-    elif x > 0:
-        return 2 * x - 2 * alpha + lamb * gamma * (np.abs(x)) ** (gamma - 1)
-    else:  # x < 0
-        return 2 * x - 2 * alpha - lamb * gamma * (np.abs(x)) ** (gamma - 1)
+    else:
+        return 2 * x - 2 * alpha + lamb * gamma * np.abs(x)**(gamma-1) * np.sign(x)
 
 
 def f_double_prime(x, alpha, gamma, lamb):
     if x == 0:
         raise ValueError("cannot evaluate second derivative at cusp x=0")
-    elif x > 0:
-        second_deriv = 2 + lamb * gamma * (gamma - 1) * np.abs(x) ** (gamma - 2)
-        # I got this next line from chatgpt to prevent
+    else:
+        second_deriv = 2 + lamb * gamma * (gamma - 1) * np.abs(x)**(gamma-2)
+        # I got the next 3 lines from chatgpt to prevent
         # "RuntimeWarning: overflow encountered in scalar divide"
-        return second_deriv if np.abs(second_deriv) > 1e-8 else np.sign(second_deriv) * 1e-8
-    else:  # x < 0
-        second_deriv = 2 - lamb * gamma * (gamma - 1) * np.abs(x) ** (gamma - 2)
-        return second_deriv if np.abs(second_deriv) > 1e-8 else np.sign(second_deriv) * 1e-8
+        if second_deriv == 0:
+            return 1e-6
+        return second_deriv if np.abs(second_deriv) > 1e-6 else np.sign(second_deriv) * 1e-6
 
 
 def newton_raphson(alpha, gamma, lamb, tolerance=1e-15, max_iter=5000):
@@ -68,6 +65,8 @@ def newton_raphson(alpha, gamma, lamb, tolerance=1e-15, max_iter=5000):
         derivative = objective_history[-1]
         second_derivative = f_double_prime(x=x_prev, alpha=alpha, gamma=gamma, lamb=lamb)
         x_k = x_prev - derivative / second_derivative
+        if np.abs(x_k) < 1e-6:  # numerically avoiding x=0 (I used chatgpt for this line)
+            x_k = 1e-6 if x_k == 0 else np.sign(x_k) * 1e-6
         objective_k = f_prime(x=x_k, alpha=alpha, gamma=gamma, lamb=lamb)
         if np.abs(objective_k) < tolerance:
             converged = True

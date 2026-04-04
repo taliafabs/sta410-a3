@@ -199,7 +199,7 @@ def improved_rosenbrock_gradient_descent(x_0=np.array([-1.5, 1.1]), nmax=300, ep
         # compute alpha_ub
         hess_eigvals = np.linalg.eigvals(hess_x_k)
         lambda_1_x = np.max(hess_eigvals)
-        # upper bound for alpha: 2 / lambda_1_x (lecture 8)
+        # upper bound for alpha: alpha <= 2 / lambda_1_x (lecture 8)
         alpha_k = bisection_alpha(x=x_k, u=u_k, alpha_lb=0,
                                   alpha_ub=(2 / lambda_1_x), tau=0.0001)
         # perform gradient descent update
